@@ -48,22 +48,24 @@ public class MainActivity extends AppCompatActivity {
             final TextView matricule = (TextView) findViewById(R.id.matricule);
             //String url = "https://puu.sh/tTPpB/4a50a9429f.json";
             //String url = "https://puu.sh/";
-            String url= "http://fierce-basin-74883.herokuapp.com/api/login/";
+            //String url = "https://puu.sh/tVg2q/4229eaae59.txt";
+            String url= "http://fierce-basin-74883.herokuapp.com/api/users/login/";
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    //(Request.Method.GET, url+matricule.getText(), null, new Response.Listener<JSONObject>() {
                     (Request.Method.GET, url+matricule.getText(), null, new Response.Listener<JSONObject>() {
-
                         @Override
                         public void onResponse(JSONObject response) {
                             setContentView(R.layout.feuille_de_login);
                             final TextView feuilleDeLoginsTW = (TextView) findViewById(R.id.logins);
                             try{
-                                JSONArray logiciels = response.getJSONArray("logiciels");
+                                JSONArray logiciels = response.getJSONArray("liste");
                                 String feuilleDeLogins= "";
                                 for(int i= 0; i<logiciels.length(); i++){
-                                    JSONObject logiciel =logiciels.getJSONObject(i);
+                                    JSONObject login =logiciels.getJSONObject(i);
+                                    JSONObject logiciel = login.getJSONObject("logiciel");
                                     feuilleDeLogins +=logiciel.get("nom")+" :\n";
-                                    feuilleDeLogins +="login : "+logiciel.get("login")+"\n";
-                                    feuilleDeLogins +="mdp : "+logiciel.get("mdp")+"\n\n";
+                                    feuilleDeLogins +="login : "+login.get("login")+"\n";
+                                    feuilleDeLogins +="mdp : "+login.get("motDePasse")+"\n\n";
                                 }
 
 
@@ -83,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
                             if(error.networkResponse==null){
                                 erreur.setText("Service Hors Ligne");
                             }else {
-                                erreur.setText("Matricule inexistant");
+                                if(error.networkResponse.statusCode==404){
+                                    erreur.setText("Matricule inexistant");
+                                }
+                                erreur.setText("code error = "+error.networkResponse.statusCode);
                             }
                         }
                     });
